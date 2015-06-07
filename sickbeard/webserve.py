@@ -775,8 +775,7 @@ class ConfigSearch:
         return _munge(t)
 
     @cherrypy.expose
-    def saveSearch(self, use_nzbs=None, use_torrents=None, nzb_dir=None, sab_username=None, sab_password=None,
-                       sab_apikey=None, sab_category=None, sab_host=None, nzbget_username=None, nzbget_password=None, nzbget_category=None, nzbget_host=None,
+    def saveSearch(self, use_nzbs=None, use_torrents=None, nzb_dir=None,xg_apikey=None, xg_host=None, nzbget_username=None, nzbget_password=None, nzbget_category=None, nzbget_host=None,
                        torrent_dir=None, nzb_method=None, usenet_retention=None, search_frequency=None, download_propers=None, ignore_words=None):
 
         results = []
@@ -793,11 +792,8 @@ class ConfigSearch:
         sickbeard.USE_NZBS = config.checkbox_to_value(use_nzbs)
         sickbeard.NZB_METHOD = nzb_method
 
-        sickbeard.SAB_HOST = config.clean_url(sab_host)
-        sickbeard.SAB_USERNAME = sab_username
-        sickbeard.SAB_PASSWORD = sab_password
-        sickbeard.SAB_APIKEY = sab_apikey.strip()
-        sickbeard.SAB_CATEGORY = sab_category
+        sickbeard.XG_HOST = config.clean_url(xg_host)
+        sickbeard.XG_APIKEY = xg_apikey.strip()
 
         if not config.change_NZB_DIR(nzb_dir):
             results += ["Unable to create directory " + os.path.normpath(nzb_dir) + ", directory not changed."]

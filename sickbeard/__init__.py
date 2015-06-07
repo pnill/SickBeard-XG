@@ -197,11 +197,8 @@ OMGWTFNZBS = False
 OMGWTFNZBS_USERNAME = None
 OMGWTFNZBS_APIKEY = None
 
-SAB_USERNAME = None
-SAB_PASSWORD = None
-SAB_APIKEY = None
-SAB_CATEGORY = None
-SAB_HOST = ''
+XG_APIKEY = None
+XG_HOST = ''
 
 NZBGET_USERNAME = None
 NZBGET_PASSWORD = None
@@ -336,7 +333,7 @@ def initialize(consoleLogging=True):
 
         global ACTUAL_LOG_DIR, LOG_DIR, WEB_PORT, WEB_LOG, WEB_ROOT, WEB_USERNAME, WEB_PASSWORD, WEB_HOST, WEB_IPV6, USE_API, API_KEY, ENABLE_HTTPS, HTTPS_CERT, HTTPS_KEY, \
                 USE_NZBS, USE_TORRENTS, NZB_METHOD, NZB_DIR, DOWNLOAD_PROPERS, \
-                SAB_USERNAME, SAB_PASSWORD, SAB_APIKEY, SAB_CATEGORY, SAB_HOST, \
+                XG_APIKEY, XG_HOST, \
                 NZBGET_USERNAME, NZBGET_PASSWORD, NZBGET_CATEGORY, NZBGET_HOST, currentSearchScheduler, backlogSearchScheduler, \
                 USE_XBMC, XBMC_ALWAYS_ON, XBMC_NOTIFY_ONSNATCH, XBMC_NOTIFY_ONDOWNLOAD, XBMC_UPDATE_FULL, XBMC_UPDATE_ONLYFIRST, \
                 XBMC_UPDATE_LIBRARY, XBMC_HOST, XBMC_USERNAME, XBMC_PASSWORD, \
@@ -460,7 +457,7 @@ def initialize(consoleLogging=True):
         USE_TORRENTS = bool(check_setting_int(CFG, 'General', 'use_torrents', 0))
 
         NZB_METHOD = check_setting_str(CFG, 'General', 'nzb_method', 'blackhole')
-        if NZB_METHOD not in ('blackhole', 'sabnzbd', 'nzbget'):
+        if NZB_METHOD not in ('blackhole', 'xgdcc', 'nzbget'):
             NZB_METHOD = 'blackhole'
 
         DOWNLOAD_PROPERS = bool(check_setting_int(CFG, 'General', 'download_propers', 1))
@@ -540,12 +537,9 @@ def initialize(consoleLogging=True):
         OMGWTFNZBS_USERNAME = check_setting_str(CFG, 'omgwtfnzbs', 'omgwtfnzbs_username', '')
         OMGWTFNZBS_APIKEY = check_setting_str(CFG, 'omgwtfnzbs', 'omgwtfnzbs_apikey', '')
 
-        CheckSection(CFG, 'SABnzbd')
-        SAB_USERNAME = check_setting_str(CFG, 'SABnzbd', 'sab_username', '')
-        SAB_PASSWORD = check_setting_str(CFG, 'SABnzbd', 'sab_password', '')
-        SAB_APIKEY = check_setting_str(CFG, 'SABnzbd', 'sab_apikey', '')
-        SAB_CATEGORY = check_setting_str(CFG, 'SABnzbd', 'sab_category', 'tv')
-        SAB_HOST = check_setting_str(CFG, 'SABnzbd', 'sab_host', '')
+        CheckSection(CFG, 'XGDCC')
+        XG_APIKEY = check_setting_str(CFG, 'XGDCC', 'xg_apikey', '')
+        XG_HOST = check_setting_str(CFG, 'XGDCC', 'xg_host', '')
 
         CheckSection(CFG, 'NZBget')
         NZBGET_USERNAME = check_setting_str(CFG, 'NZBget', 'nzbget_username', 'nzbget')
@@ -1089,12 +1083,9 @@ def save_config():
     new_config['omgwtfnzbs']['omgwtfnzbs_username'] = OMGWTFNZBS_USERNAME
     new_config['omgwtfnzbs']['omgwtfnzbs_apikey'] = OMGWTFNZBS_APIKEY
 
-    new_config['SABnzbd'] = {}
-    new_config['SABnzbd']['sab_username'] = SAB_USERNAME
-    new_config['SABnzbd']['sab_password'] = SAB_PASSWORD
-    new_config['SABnzbd']['sab_apikey'] = SAB_APIKEY
-    new_config['SABnzbd']['sab_category'] = SAB_CATEGORY
-    new_config['SABnzbd']['sab_host'] = SAB_HOST
+    new_config['XGDCC'] = {}
+    new_config['XGDCC']['xg_apikey'] = XG_APIKEY
+    new_config['XGDCC']['xg_host'] = XG_HOST
 
     new_config['NZBget'] = {}
     new_config['NZBget']['nzbget_username'] = NZBGET_USERNAME

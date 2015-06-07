@@ -36,40 +36,51 @@ from sickbeard import logger
 from sickbeard.exceptions import ex
 
 
-def sendNZB(nzb):
+def sendPack(pack):
     """
-    Sends an NZB to SABnzbd via the API.
-
-    nzb: The NZBSearchResult object to send to SAB
+    Sends an XDLink to XG so XG knows where to connect and grab the pack needed
     """
 
-    xdlink = nzb.url.split('/')
-    logger.log(u"IRC Server: "+xdlink[0])
-    logger.log(u"Channel: "+xdlink[2])
-    logger.log(u"Bot: "+xdlink[3])
-    logger.log(u"PacketId: "+xdlink[4])
-    logger.log(u"PacketName: "+xdlink[5])
+    if sickbeard.XG_APIKEY != None:
+        apikey = sickbeard.XG_APIKEY
 
-    #params = {}
-    #params['Server'] = xdlink[0]
-    #params['Channel'] = xdlink[2]
-    #params['Bot'] = xdlink[3]
-    #params['PacketId'] = xdlink[4]
-    #params['PacketName'] = xdlink[5]
-    
-    parameters = {'ApiKey' : 'ba663f95-6375-4f9c-ba92-e472a8fa661e','Server' : xdlink[0], 'Channel' : xdlink[2], 'Bot' : xdlink[3], 'PacketId' : xdlink[4], 'PacketName' : xdlink[5] }
-    
-    url = sickbeard.SAB_HOST + "api/1.0/parseXDCC"
+    xdlink = pack.url.split('/')
+    params = {}
+    params["ApiKey"] = apikey
+    params["Server"] = xdlink[0]
+    params["Channel"] = xdlink[2]
+    params["Bot"] = xdlink[3]
+    params["PacketId"] = xdlink[4]
+    params["PacketName"] = xdlink[5]
 
-    logger.log(u"Sending XDLink to XG: %s" % nzb.name)
-    logger.log(u"XDlink: " + url, logger.DEBUG)
+    url = sickbeard.XG_HOST + "api/1.0/parseXDCC"
+
+    logger.log(u"Sending Pack to XG: %s" % pack.name)
+    logger.log(u"Pack URL: " + url, logger.DEBUG)
 
     try:
-        data = urllib.urlencode(parameters)
+        data = urllib.urlencode(params)
         request = urllib2.Request(url,data)
-        request.add_header('Authorization', 'ba663f95-6375-4f9c-ba92-e472a8fa661e')
+        request.add_header('Authorization', apikey)
         f = urllib2.urlopen(request)
 
+    except urllib2.HTTPError, e:
+        if(e.code == 401):
+            logger.log(u"Unable to connecto XG: Bad API Key")
+            logger.log(u"If the API key is good it's probably not enabled in XG")
+            logger.log(u"Api Key:" + params["ApiKey"])
+        else:
+            logger.log(u"Unable to connect to XG: HTTPEror = " + str(e.code))
+
+        return False
+
+    except urllib2.URLError, e:
+        logger.log(u"Unable to connect to XG: UrlError = " + str(e.reason))
+        return False
+
+    except urllib2.HTTPException, e:
+        logger.log(u"Unable to connect to XG: HTTPException")
+        return False
 
     except (EOFError, IOError), e:
         logger.log(u"Unable to connect to XG: " + ex(e), logger.ERROR)
@@ -103,7 +114,7 @@ def sendNZB(nzb):
 
     # do some crude parsing of the result text to determine what SAB said
     if sabText == "ok":
-        logger.log(u"XDlink sent to XG successfully", logger.DEBUG)
+        logger.log(u"Pack sent to XG successfully", logger.DEBUG)
         return True
     elif sabText == "Missing authentication":
         logger.log(u"Incorrect username/password sent to SAB, NZB not sent", logger.ERROR)
@@ -141,9 +152,12 @@ def _checkSabResponse(f):
         return True, sabText
 
 
-def _sabURLOpenSimple(url):
+def _sabURLOpenSimple(url,apikey):
     try:
-        f = urllib.urlopen(url)
+        request = urlib2.request(url)
+        request.add_header('Authorization',apikey)
+        f = urllib2.urlopen(request)
+
     except (EOFError, IOError), e:
         logger.log(u"Unable to connect to SAB: " + ex(e), logger.ERROR)
         return False, "Unable to connect"
@@ -160,7 +174,7 @@ def _sabURLOpenSimple(url):
 def getSabAccesMethod(host=None, username=None, password=None, apikey=None):
     url = host + "api?mode=auth"
 
-    result, f = _sabURLOpenSimple(url)
+    result, f = _sabURLOpenSimple(url,apikey)
     if not result:
         return False, f
 
@@ -173,34 +187,33 @@ def getSabAccesMethod(host=None, username=None, password=None, apikey=None):
 
 def testAuthentication(host=None, username=None, password=None, apikey=None):
     """
-    Sends a simple API request to SAB to determine if the given connection information is connect
+    Sends a simple API request to XG to determine if the given connection information is connect
 
-    host: The host where SAB is running (incl port)
-    username: The username to use for the HTTP request
-    password: The password to use for the HTTP request
-    apikey: The API key to provide to SAB
+    apikey: The API key to provide to XG
 
     Returns: A tuple containing the success boolean and a message
     """
 
-    # build up the URL parameters
-    params = {}
-    params['mode'] = 'queue'
-    params['output'] = 'json'
-    params['ma_username'] = username
-    params['ma_password'] = password
-    params['apikey'] = apikey
-    url = host + "api?" + urllib.urlencode(params)
+    url = host + "api/1.0/ApiTest" 
+    
+    logger.log(u"XG test URL: " + url, logger.DEBUG)
+   
 
-    # send the test request
-    logger.log(u"SABnzbd test URL: " + url, logger.DEBUG)
     result, f = _sabURLOpenSimple(url)
     if not result:
         return False, f
 
-    # check the result and determine if it's good or not
-    result, sabText = _checkSabResponse(f)
-    if not result:
-        return False, sabText
+    try:
+        result = f.readlines()
+    except Exception, e:
+        logger.log("Exception reading the result from XG")
 
-    return True, "Success"
+    sabText = result[0].strip()
+
+    logger.log(u"Result text from XG: " + sabText, logger.DEBUG)
+
+    if sabText == "ok":
+        logger.log(u"Connected to XG Successfully", logger.DEBUG)
+        return True, "Success"
+    else:
+        return False, "Failed"

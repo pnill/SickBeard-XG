@@ -307,7 +307,7 @@ class NewznabCache(tvcache.TVCache):
             params['apikey'] = self.provider.key
 
         rss_url = self.provider.url + 'api?' + urllib.urlencode(params)
-
+   
         logger.log(self.provider.name + " cache update URL: " + rss_url, logger.DEBUG)
 
         data = self.provider.getURL(rss_url)

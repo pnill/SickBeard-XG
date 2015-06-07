@@ -107,8 +107,8 @@ def snatchEpisode(result, endStatus=SNATCHED):
     if result.resultType in ("nzb", "nzbdata"):
         if sickbeard.NZB_METHOD == "blackhole":
             dlResult = _downloadResult(result)
-        elif sickbeard.NZB_METHOD == "sabnzbd":
-            dlResult = sab.sendNZB(result)
+        elif sickbeard.NZB_METHOD == "xgdcc":
+            dlResult = sab.sendPack(result)
         elif sickbeard.NZB_METHOD == "nzbget":
             dlResult = nzbget.sendNZB(result)
         else:
@@ -196,7 +196,7 @@ def searchForNeededEpisodes():
             foundResults[curEp] = bestResult
 
     if not didSearch:
-        logger.log(u"No NZB/Torrent providers found or enabled in the sickbeard config. Please check your settings.", logger.ERROR)
+        logger.log(u"No DCC/NZB/Torrent providers found or enabled in the sickbeard config. Please check your settings.", logger.ERROR)
 
     return foundResults.values()
 
