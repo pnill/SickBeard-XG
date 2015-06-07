@@ -38,7 +38,7 @@ from sickbeard.exceptions import ex
 
 def sendPack(pack):
     """
-    Sends an XDLink to XG so XG knows where to connect and grab the pack needed
+    Sends an Pack to XG
     """
 
     if sickbeard.XG_APIKEY != None:
@@ -92,19 +92,19 @@ def sendPack(pack):
 
     # this means we couldn't open the connection or something just as bad
     if f is None:
-        logger.log(u"No data returned from XG, XDlink not sent", logger.ERROR)
+        logger.log(u"No data returned from XG, Pack not sent", logger.ERROR)
         return False
 
-    # if we opened the URL connection then read the result from SAB
+    # if we opened the URL connection then read the result from XG
     try:
         result = f.readlines()
     except Exception, e:
-        logger.log(u"Error trying to get result from XG, XDlink not sent: " + ex(e), logger.ERROR)
+        logger.log(u"Error trying to get result from XG, Pack not sent: " + ex(e), logger.ERROR)
         return False
 
-    # SAB shouldn't return a blank result, this most likely (but not always) means that it timed out and didn't receive the NZB
+    # SAB shouldn't return a blank result, this most likely (but not always) means that it timed out and didn't receive the Pack
     if len(result) == 0:
-        logger.log(u"No data returned from XG, XDlink not sent", logger.ERROR)
+        logger.log(u"No data returned from XG, pack not sent", logger.ERROR)
         return False
 
     # massage the result a little bit
@@ -112,28 +112,28 @@ def sendPack(pack):
 
     logger.log(u"Result text from XG: " + sabText, logger.DEBUG)
 
-    # do some crude parsing of the result text to determine what SAB said
+    # do some crude parsing of the result text to determine what XG said
     if sabText == "ok":
         logger.log(u"Pack sent to XG successfully", logger.DEBUG)
         return True
     elif sabText == "Missing authentication":
-        logger.log(u"Incorrect username/password sent to SAB, NZB not sent", logger.ERROR)
+        logger.log(u"Incorrect username/password sent to XG-SBmod, pack not sent", logger.ERROR)
         return False
     else:
-        logger.log(u"Unknown failure sending link to XG. Return text is: " + sabText, logger.ERROR)
+        logger.log(u"Unknown failure sending link to XG-SBmod. Return text is: " + sabText, logger.ERROR)
         return False
 
 
-def _checkSabResponse(f):
+def _checkXGResponse(f):
     try:
         result = f.readlines()
     except Exception, e:
-        logger.log(u"Error trying to get result from SAB" + ex(e), logger.ERROR)
-        return False, "Error from SAB"
+        logger.log(u"Error trying to get result from XG-SBmod" + ex(e), logger.ERROR)
+        return False, "Error from XG"
 
     if len(result) == 0:
-        logger.log(u"No data returned from SABnzbd, NZB not sent", logger.ERROR)
-        return False, "No data from SAB"
+        logger.log(u"No data returned from XG-SBmod, Pack not sent", logger.ERROR)
+        return False, "No data from XG"
 
     sabText = result[0].strip()
     sabJson = {}
@@ -143,8 +143,8 @@ def _checkSabResponse(f):
         pass
 
     if sabText == "Missing authentication":
-        logger.log(u"Incorrect username/password sent to SAB", logger.ERROR)
-        return False, "Incorrect username/password sent to SAB"
+        logger.log(u"Incorrect username/password sent to XG-SBmod", logger.ERROR)
+        return False, "Incorrect username/password sent to SG-SBmod"
     elif 'error' in sabJson:
         logger.log(sabJson['error'], logger.ERROR)
         return False, sabJson['error']
@@ -152,21 +152,21 @@ def _checkSabResponse(f):
         return True, sabText
 
 
-def _sabURLOpenSimple(url,apikey):
+def _xgURLOpenSimple(url,apikey):
     try:
         request = urlib2.request(url)
         request.add_header('Authorization',apikey)
         f = urllib2.urlopen(request)
 
     except (EOFError, IOError), e:
-        logger.log(u"Unable to connect to SAB: " + ex(e), logger.ERROR)
+        logger.log(u"Unable to connect to XG: " + ex(e), logger.ERROR)
         return False, "Unable to connect"
     except httplib.InvalidURL, e:
-        logger.log(u"Invalid SAB host, check your config: " + ex(e), logger.ERROR)
-        return False, "Invalid SAB host"
+        logger.log(u"Invalid XG host, check your config: " + ex(e), logger.ERROR)
+        return False, "Invalid XG host"
     if f is None:
-        logger.log(u"No data returned from SABnzbd", logger.ERROR)
-        return False, "No data returned from SABnzbd"
+        logger.log(u"No data returned from XG-SBmod", logger.ERROR)
+        return False, "No data returned from XG-SBmod"
     else:
         return True, f
 
@@ -199,7 +199,7 @@ def testAuthentication(host=None, username=None, password=None, apikey=None):
     logger.log(u"XG test URL: " + url, logger.DEBUG)
    
 
-    result, f = _sabURLOpenSimple(url)
+    result, f = _xgURLOpenSimple(url)
     if not result:
         return False, f
 
