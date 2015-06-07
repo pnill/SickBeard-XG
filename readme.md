@@ -1,3 +1,9 @@
+Sick Beard DCC Modification / 'hack'
+==================
+This mod / 'hack' I call SickBeard-XG it's intended to search DCC RSS Feeds (There's an example output/indexer on my github "XG-Feed").
+
+It also gathers data from the feeds and downloads the TV shows using DCC instead of Usenet or Torrent by sending the pack links to 'XG-Mod' which can also be found on my github.
+
 Sick Beard
 =====
 
@@ -38,7 +44,7 @@ To run Sick Beard from source you will need Python 2.5+ and Cheetah 2.1.0+.
 The [binary releases][githubdownloads] are standalone. Build 503 and older can be found on the now defunct [legacy releases][googledownloads].
 
 ## Bugs
-
+(Note: Don't submit bugs related to DCC to these areas, you can use the github issue system for that, the original implementation of sickbeard did not support DCC only this 'hack'/modification does.)
 If you find a bug please report it or it'll never get fixed. Verify that it hasn't [already been submitted][googleissues] and then [log a new bug][googlenewissue]. Be sure to provide as much information as possible.
 
 [cherrypy]: http://www.cherrypy.org
