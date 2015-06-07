@@ -2,7 +2,7 @@ Sick Beard-XG
 ==================
 This mod / 'hack' I call SickBeard-XG it's intended to search DCC RSS Feeds (There's an example output/indexer on my github "XG-Feed").
 
-It also gathers data from the feeds and downloads the TV shows using DCC instead of Usenet or Torrent by sending the pack links to 'XG-Mod' which can also be found on my github.
+It also gathers data from the feeds and downloads the TV shows using DCC instead of Usenet or Torrent by sending the pack links to 'XG-SBMod' which can also be found on my github.
 
 Sick Beard
 =====
