@@ -1,4 +1,4 @@
-Sick Beard DCC Modification / 'hack'
+Sick Beard-XG
 ==================
 This mod / 'hack' I call SickBeard-XG it's intended to search DCC RSS Feeds (There's an example output/indexer on my github "XG-Feed").
 
