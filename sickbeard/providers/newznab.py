@@ -91,10 +91,9 @@ class NewznabProvider(generic.NZBProvider):
         for cur_exception in name_exceptions:
 
             cur_params = {}
-
             # search directly by tvrage id
-            if show.tvrid:
-                cur_params['rid'] = show.tvrid
+            if show.tvdbid:
+                cur_params['rid'] = show.tvdbid
             # if we can't then fall back on a very basic name search
             else:
                 cur_params['q'] = helpers.sanitizeSceneName(cur_exception)
@@ -124,8 +123,8 @@ class NewznabProvider(generic.NZBProvider):
             return [params]
 
         # search directly by tvrage id
-        if ep_obj.show.tvrid:
-            params['rid'] = ep_obj.show.tvrid
+        if ep_obj.show.tvdbid:
+            params['rid'] = ep_obj.show.tvdbid
         # if we can't then fall back on a very basic name search
         else:
             params['q'] = helpers.sanitizeSceneName(ep_obj.show.name)
